@@ -6,8 +6,16 @@
     <title>منصة الخبير البرمجي المتقدم | AI Web Expert</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Marked.js لتنسيق الأكواد والنصوص البرمجية -->
+    <!-- Marked.js لتنسيق الأكواد -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Google Gen AI SDK الرسمي لضمان عمل المفتاح بدون أخطاء -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.run/@google/genai"
+        }
+      }
+    </script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -48,7 +56,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">مفتاح Google API Key</label>
-                    <input type="password" id="apiKey" placeholder="ألصق المفتاح هنا مرة واحدة فقط..." class="w-full bg-card border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-accent transition-colors">
+                    <input type="password" id="apiKey" placeholder="ألصق المفتاح هنا مرة واحدة..." class="w-full bg-card border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-accent transition-colors">
                     <p class="text-[10px] text-emerald-400 mt-1">✨ يتم الحفظ تلقائياً في متصفحك للأمان.</p>
                 </div>
             </div>
@@ -97,10 +105,11 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
+        import { GoogleGenAI } from "@google/genai";
+
         const apiKeyInput = document.getElementById('apiKey');
 
-        // استرجاع المفتاح أو حفظه تلقائياً عند الكتابة فيه
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('gemini_secure_key');
             if (savedKey) {
@@ -115,7 +124,7 @@
             }
         });
 
-        function clearChat() {
+        window.clearChat = function() {
             const container = document.getElementById('chatContainer');
             container.innerHTML = `
                 <div class="flex items-start gap-3 max-w-2xl">
@@ -130,7 +139,7 @@
         const systemPersona = `أنت مساعد ذكي وخبير تقني محترف ومطور ويب شامل (Full-Stack Developer & UI/UX Expert). 
         متخصص حصرياً في تصميم وتطوير واجهات وتجربة المستخدم وهندسة المواقع الإلكترونية الحديثة بأسلوب فخم واحترافي، وحل الأخطاء البرمجية بكل لغات البرمجة. أجب دائماً بلغة عربية دقيقة، منظمة، واعرض الأكواد البرمجية داخل بلوكات واضحة مع شرح تنفيذي مفصل.`;
 
-        async function sendMessage() {
+        window.sendMessage = async function() {
             const input = document.getElementById('userInput');
             const container = document.getElementById('chatContainer');
             const sendBtn = document.getElementById('sendBtn');
@@ -139,12 +148,11 @@
             const text = input.value.trim();
 
             if (!key) {
-                alert('يرجى إدخال مفتاح الـ API في القائمة الجانبية مرة واحدة فقط ليرتبط بالمتصفح.');
+                alert('يرجى إدخال مفتاح الـ API في القائمة الجانبية مرة واحدة فقط.');
                 return;
             }
             if (!text) return;
 
-            // عرض رسالة المستخدم
             container.innerHTML += `
                 <div class="flex items-start gap-3 justify-end">
                     <div class="bg-blue-600 text-white p-4 rounded-2xl rounded-tl-none text-sm max-w-2xl leading-relaxed shadow-sm">
@@ -161,47 +169,35 @@
             sendBtn.innerHTML = 'جاري التحليل...';
 
             try {
-                const fullPrompt = `${systemPersona}\n\nطلب المستخدم أو سؤاله البرمجي: ${text}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+                // التهيئة باستخدام مكتبة جوجل الرسمية
+                const ai = new GoogleGenAI({ apiKey: key });
                 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: fullPrompt }] }]
-                    })
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: text,
+                    config: {
+                        systemInstruction: systemPersona,
+                    }
                 });
 
-                const data = await response.json();
+                const rawAiText = response.text;
+                const formattedHtml = marked.parse(rawAiText);
 
-                if (data.candidates && data.candidates.length > 0) {
-                    const rawAiText = data.candidates[0].content.parts[0].text;
-                    const formattedHtml = marked.parse(rawAiText);
-
-                    container.innerHTML += `
-                        <div class="flex items-start gap-3 max-w-3xl">
-                            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-lg shadow-blue-500/20">AI</div>
-                            <div class="bg-card border border-slate-800 p-5 rounded-2xl rounded-tr-none text-sm text-slate-200 leading-relaxed shadow-sm space-y-3 overflow-x-auto">
-                                ${formattedHtml}
-                            </div>
+                container.innerHTML += `
+                    <div class="flex items-start gap-3 max-w-3xl">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-lg shadow-blue-500/20">AI</div>
+                        <div class="bg-card border border-slate-800 p-5 rounded-2xl rounded-tr-none text-sm text-slate-200 leading-relaxed shadow-sm space-y-3 overflow-x-auto">
+                            ${formattedHtml}
                         </div>
-                    `;
-                } else {
-                    container.innerHTML += `
-                        <div class="flex items-start gap-3 max-w-2xl">
-                            <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0 text-sm font-bold">!</div>
-                            <div class="bg-card border border-red-900/50 p-4 rounded-2xl rounded-tr-none text-sm text-red-300">
-                                خطأ: مفتاح الـ API غير صالح أو انتهت صلاحيته.
-                            </div>
-                        </div>
-                    `;
-                }
+                    </div>
+                `;
             } catch (err) {
+                console.error(err);
                 container.innerHTML += `
                     <div class="flex items-start gap-3 max-w-2xl">
                         <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0 text-sm font-bold">!</div>
                         <div class="bg-card border border-red-900/50 p-4 rounded-2xl rounded-tr-none text-sm text-red-300">
-                            فشل الاتصال بالخادم، تحقق من شبكة الإنترنت.
+                            خطأ في الاتصال أو مفتاح غير صالح: تأكد من مفتاح الـ API.
                         </div>
                     </div>
                 `;

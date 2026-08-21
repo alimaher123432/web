@@ -1,68 +1,227 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خبير البرمجة وتصميم المواقع | AI Assistant</title>
+    <title>منصة الخبير البرمجي المتقدم | AI Web Expert</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js لتنسيق الأكواد والنصوص البرمجية -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#090d16',
+                        panel: '#0f172a',
+                        card: '#1e293b',
+                        accent: '#3b82f6',
+                        accentHover: '#2563eb'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root { --primary: #007bff; --bg: #0f172a; --panel: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; }
-        /* Sidebar */
-        #sidebar { width: 300px; background: var(--panel); padding: 20px; border-left: 1px solid #334155; }
-        #main { flex: 1; display: flex; flex-direction: column; }
-        #chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { padding: 15px; border-radius: 10px; max-width: 80%; }
-        .ai { background: #334155; align-self: flex-start; }
-        .user { background: var(--primary); align-self: flex-end; }
-        #input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; }
-        input, button { padding: 12px; border-radius: 5px; border: none; }
-        input { flex: 1; background: #0f172a; color: white; }
-        button { background: var(--primary); color: white; cursor: pointer; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        pre { background: #020617 !important; padding: 1rem; border-radius: 0.5rem; border: 1px solid #1e293b; direction: ltr; text-align: left; overflow-x: auto; margin: 0.5rem 0; }
+        code { font-family: monospace; color: #60a5fa; }
     </style>
 </head>
-<body>
+<body class="bg-darker text-slate-100 h-screen flex flex-col md:flex-row overflow-hidden font-sans">
 
-    <div id="sidebar">
-        <h2>إعدادات الخبير</h2>
-        <input type="password" id="apiKey" placeholder="أدخل Google API Key هنا..." style="width: 100%; margin-bottom: 10px;">
-        <p style="font-size: 0.8em; color: #94a3b8;">هذا البوت خبير في HTML, CSS, JS, Python, وتصميم الواجهات.</p>
-    </div>
+    <!-- لوحة التحكم الجانبية -->
+    <aside class="w-full md:w-80 bg-panel border-b md:border-b-0 md:border-l border-slate-800 p-5 flex flex-col justify-between shrink-0">
+        <div>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/30">💻</div>
+                <div>
+                    <h1 class="font-bold text-lg text-blue-400">الخبير البرمجي</h1>
+                    <p class="text-xs text-slate-400">تصميم وتطوير المواقع حسب الطلب</p>
+                </div>
+            </div>
 
-    <div id="main">
-        <div id="chat-box"></div>
-        <div id="input-area">
-            <input type="text" id="userInput" placeholder="اطلب مني تصميم موقع أو حل مشكلة برمجية...">
-            <button onclick="sendMessage()">إرسال</button>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">مفتاح Google API Key</label>
+                    <input type="password" id="apiKey" placeholder="ألصق المفتاح هنا مرة واحدة فقط..." class="w-full bg-card border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-accent transition-colors">
+                    <p class="text-[10px] text-emerald-400 mt-1">✨ يتم الحفظ تلقائياً في متصفحك للأمان.</p>
+                </div>
+            </div>
+
+            <div class="mt-8 border-t border-slate-800/80 pt-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">مميزات النظام الذكي</h3>
+                <ul class="text-xs text-slate-400 space-y-2">
+                    <li class="flex items-center gap-2">🔹 خبير في هندسة وتصميم المواقع</li>
+                    <li class="flex items-center gap-2">🔹 دعم كامل لكتابة وتصحيح الأكواد</li>
+                    <li class="flex items-center gap-2">🔹 واجهة سوداء فاخرة ومظلمة</li>
+                </ul>
+            </div>
         </div>
-    </div>
+
+        <div class="text-center pt-4 border-t border-slate-800 text-[11px] text-slate-500">
+            تم التطوير بواسطة علي ماهر • 2026
+        </div>
+    </aside>
+
+    <!-- منطقة المحادثة الرئيسية -->
+    <main class="flex-1 flex flex-col h-full bg-darker relative">
+        <header class="bg-panel/50 backdrop-blur border-b border-slate-800 px-6 py-3.5 flex justify-between items-center z-10">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-sm font-medium text-slate-300">مستشار الويب الذكي متصل</span>
+            </div>
+            <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-red-400 transition-colors bg-card px-3 py-1.5 rounded-md border border-slate-700/60">محادثة جديدة</button>
+        </header>
+
+        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            <div class="flex items-start gap-3 max-w-2xl">
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-md">AI</div>
+                <div class="bg-card border border-slate-800 p-4 rounded-2xl rounded-tr-none text-sm text-slate-200 leading-relaxed shadow-sm">
+                    أهلاً بك يا علي! أنا مستشارك البرمجي وخبير هندسة المواقع. اطرح أي سؤال أو اطلب تصميم أي موقع وسأقوم ببرمجته وشرحه لك فوراً.
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 md:p-6 bg-panel/50 backdrop-blur border-t border-slate-800">
+            <div class="max-w-4xl mx-auto flex gap-3">
+                <textarea id="userInput" rows="1" placeholder="اطلب تصميم موقع فخم، أو استفسر عن أي كود برمجي..." class="flex-1 bg-card border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-accent resize-none max-h-32 transition-colors"></textarea>
+                <button onclick="sendMessage()" id="sendBtn" class="bg-accent hover:bg-accentHover text-white px-6 rounded-xl font-medium text-sm transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center shrink-0">
+                    إرسال
+                </button>
+            </div>
+        </div>
+    </main>
 
     <script>
+        const apiKeyInput = document.getElementById('apiKey');
+
+        // استرجاع المفتاح أو حفظه تلقائياً عند الكتابة فيه
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('gemini_secure_key');
+            if (savedKey) {
+                apiKeyInput.value = savedKey;
+            }
+        });
+
+        apiKeyInput.addEventListener('input', () => {
+            const val = apiKeyInput.value.trim();
+            if (val) {
+                localStorage.setItem('gemini_secure_key', val);
+            }
+        });
+
+        function clearChat() {
+            const container = document.getElementById('chatContainer');
+            container.innerHTML = `
+                <div class="flex items-start gap-3 max-w-2xl">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-sm font-bold">AI</div>
+                    <div class="bg-card border border-slate-800 p-4 rounded-2xl rounded-tr-none text-sm text-slate-200 leading-relaxed shadow-sm">
+                        تمت إعادة تعيين المحادثة. كيف يمكنني مساعدتك برمجياً اليوم؟
+                    </div>
+                </div>
+            `;
+        }
+
+        const systemPersona = `أنت مساعد ذكي وخبير تقني محترف ومطور ويب شامل (Full-Stack Developer & UI/UX Expert). 
+        متخصص حصرياً في تصميم وتطوير واجهات وتجربة المستخدم وهندسة المواقع الإلكترونية الحديثة بأسلوب فخم واحترافي، وحل الأخطاء البرمجية بكل لغات البرمجة. أجب دائماً بلغة عربية دقيقة، منظمة، واعرض الأكواد البرمجية داخل بلوكات واضحة مع شرح تنفيذي مفصل.`;
+
         async function sendMessage() {
             const input = document.getElementById('userInput');
-            const key = document.getElementById('apiKey').value;
-            const chatBox = document.getElementById('chat-box');
-            
-            if (!key) return alert('يرجى إدخال API Key');
-            if (!input.value) return;
+            const container = document.getElementById('chatContainer');
+            const sendBtn = document.getElementById('sendBtn');
 
-            // إضافة رسالة المستخدم
-            chatBox.innerHTML += `<div class="msg user">${input.value}</div>`;
-            const prompt = `أنت خبير في تصميم المواقع ولغات البرمجة. أجب على هذا السؤال بدقة: ${input.value}`;
+            const key = apiKeyInput.value.trim() || localStorage.getItem('gemini_secure_key');
+            const text = input.value.trim();
+
+            if (!key) {
+                alert('يرجى إدخال مفتاح الـ API في القائمة الجانبية مرة واحدة فقط ليرتبط بالمتصفح.');
+                return;
+            }
+            if (!text) return;
+
+            // عرض رسالة المستخدم
+            container.innerHTML += `
+                <div class="flex items-start gap-3 justify-end">
+                    <div class="bg-blue-600 text-white p-4 rounded-2xl rounded-tl-none text-sm max-w-2xl leading-relaxed shadow-sm">
+                        ${escapeHtml(text)}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center shrink-0 text-sm font-bold">أنت</div>
+                </div>
+            `;
+
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = 'جاري التحليل...';
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const fullPrompt = `${systemPersona}\n\nطلب المستخدم أو سؤاله البرمجي: ${text}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+                
+                const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: fullPrompt }] }]
+                    })
                 });
+
                 const data = await response.json();
-                const aiText = data.candidates[0].content.parts[0].text;
-                chatBox.innerHTML += `<div class="msg ai">${aiText.replace(/\n/g, '<br>')}</div>`;
-            } catch (e) {
-                chatBox.innerHTML += `<div class="msg ai">خطأ: تأكد من مفتاح الـ API.</div>`;
+
+                if (data.candidates && data.candidates.length > 0) {
+                    const rawAiText = data.candidates[0].content.parts[0].text;
+                    const formattedHtml = marked.parse(rawAiText);
+
+                    container.innerHTML += `
+                        <div class="flex items-start gap-3 max-w-3xl">
+                            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-lg shadow-blue-500/20">AI</div>
+                            <div class="bg-card border border-slate-800 p-5 rounded-2xl rounded-tr-none text-sm text-slate-200 leading-relaxed shadow-sm space-y-3 overflow-x-auto">
+                                ${formattedHtml}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML += `
+                        <div class="flex items-start gap-3 max-w-2xl">
+                            <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0 text-sm font-bold">!</div>
+                            <div class="bg-card border border-red-900/50 p-4 rounded-2xl rounded-tr-none text-sm text-red-300">
+                                خطأ: مفتاح الـ API غير صالح أو انتهت صلاحيته.
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                container.innerHTML += `
+                    <div class="flex items-start gap-3 max-w-2xl">
+                        <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0 text-sm font-bold">!</div>
+                        <div class="bg-card border border-red-900/50 p-4 rounded-2xl rounded-tr-none text-sm text-red-300">
+                            فشل الاتصال بالخادم، تحقق من شبكة الإنترنت.
+                        </div>
+                    </div>
+                `;
             }
-            input.value = '';
+
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'إرسال';
+            container.scrollTop = container.scrollHeight;
         }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        document.getElementById('userInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
     </script>
 </body>
 </html>
